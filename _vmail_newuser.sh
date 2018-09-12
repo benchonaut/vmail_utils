@@ -11,8 +11,6 @@ echo "SELECT * FROM vmail.\`domains\` WHERE domain='"$domain"'" | mysql -u vmail
     dovestring=$((echo "$newmailuserpass";echo "$newmailuserpass")|doveadm pw -s SHA512-CRYPT |cut -d"}" -f2-);
     echo "INSERT INTO vmail.\`users\` (\`id\`, \`username\`, \`domain\`, \`password\`) VALUES (NULL, '"$usertogen"', '"$domain"', '"$dovestring"');" | mysql -u vmail -p"$vmailpass"  ;
     echo "SELECT * FROM vmail.\`users\` WHERE domain='"$domain"' AND username='"$usertogen"'" | mysql -u vmail -p"$vmailpass";
-    echo "SELECT * FROM vmail.\`aliases\` WHERE source='@"$domain"'" | mysql -u vmail -p"$vmailpass"|grep -q "$domain" &&
-		(echo CATCHALL EXISTS, GENERATING DIRECT ALIAS ;
-		echo "SELECT * FROM vmail.\`aliases\` WHERE source='"$usertogen"@"$domain"' AND destination='"$usertogen"@"$domain"'"  | mysql -u vmail -p"$vmailpass"|grep "$usertogen"'@'"$domain" ||
-		(echo NO DIRECT ALIAS,GENERATING ; echo "INSERT INTO vmail.\`aliases\` (\`source\`,\`destination\`) VALUES ('"$usertogen"@"$domain"','"$usertogen"@"$domain"');"| mysql -u vmail -p"$vmailpass" ) &&
-		 echo DIRECT ALIAS ALREADY THERE ) ))
+    echo "SELECT * FROM vmail.\`aliases\` WHERE source='@"$domain"'" | mysql -u vmail -p"$vmailpass"|grep -q "$domain" && (echo CATCHALL EXISTS, GENERATING DIRECT ALIAS ;
+		echo "SELECT * FROM vmail.\`aliases\` WHERE source='"$usertogen"@"$domain"' AND destination='"$usertogen"@"$domain"'"  | mysql -u vmail -p"$vmailpass"|grep "$usertogen"'@'"$domain"  && echo DIRECT ALIAS ALREADY THERE ||
+		(echo NO DIRECT ALIAS,GENERATING ; echo "INSERT INTO vmail.\`aliases\` (\`source\`,\`destination\`) VALUES ('"$usertogen"@"$domain"','"$usertogen"@"$domain"');"| mysql -u vmail -p"$vmailpass" ) ) ))
